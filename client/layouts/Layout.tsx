@@ -1,14 +1,14 @@
-import type { UserDto } from 'common/types/user';
-import { Loading } from 'components/loading/Loading';
+import type { UserDto } from 'common/types/user'; //ユーザーのデータ型を定義
+import { Loading } from 'components/loading/Loading'; //ローディングコンポーネントをインポート
 import { useLoading } from 'components/loading/useLoading';
 import { AuthedWebSocket } from 'features/ws/AuthedWebSocket';
-import { useAlert } from 'hooks/useAlert';
-import { useConfirm } from 'hooks/useConfirm';
-import { useUser } from 'hooks/useUser';
-import { BasicHeader } from 'layouts/basicHeader/BasicHeader';
-import { useRouter } from 'next/router';
+import { useAlert } from 'hooks/useAlert'; //ローディング、アラート、確認ダイアログを管理するカスタムフックをインポート
+import { useConfirm } from 'hooks/useConfirm'; //認証されたWebSocket接続を管理するコンポーネント
+import { useUser } from 'hooks/useUser'; //ユーザー情報を管理するカスタムフック
+import { BasicHeader } from 'layouts/basicHeader/BasicHeader'; //基本的なヘッダーコンポーネント
+import { useRouter } from 'next/router'; //ルーターを使用するためのフック
 import React from 'react';
-import { pagesPath } from 'utils/$path';
+import { pagesPath } from 'utils/$path'; //ページパスのユーティリティ
 
 export const Layout = (props: { render: (user: UserDto) => React.ReactNode }) => {
   const router = useRouter();
