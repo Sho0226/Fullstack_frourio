@@ -11,6 +11,7 @@ import React from 'react';
 import { pagesPath } from 'utils/$path'; //ページパスのユーティリティ
 
 export const Layout = (props: { render: (user: UserDto) => React.ReactNode }) => {
+  //Layout コンポーネントは、props として render 関数を受け取る
   const router = useRouter();
   const { user } = useUser();
   const { loadingElm } = useLoading();
@@ -24,15 +25,21 @@ export const Layout = (props: { render: (user: UserDto) => React.ReactNode }) =>
 
     return <Loading visible />;
   }
+  //user.inited が false の場合、ユーザー情報がまだ初期化されていないため、Loading コンポーネントを表示します。
+  //user.data が null の場合、ログインページにリダイレクトし、Loading コンポーネントを表示
 
   return (
     <div>
       <AuthedWebSocket />
+      {/* 認証済みのWebSocket接続を確立するコンポーネント */}
       <BasicHeader user={user.data} />
+      {/* ユーザー情報を表示するヘッダーコンポーネント */}
       {props.render(user.data)}
+      {/* props.render 関数を使って、user.data を渡してコンテンツをレンダリング */}
       {loadingElm}
       {alertElm}
       {confirmElm}
+      {/* それぞれロード中、アラート、確認ダイアログの要素を表示 */}
     </div>
   );
 };
