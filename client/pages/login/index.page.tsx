@@ -16,7 +16,7 @@ const Login = () => {
   useEffect(() => {
     if (user.data !== null) router.replace(pagesPath.$url());
   }, [user, router]);
-
+  //user.dataがnullでない場合、つまりユーザーがログインしている場合、router.replaceを使って別のページにリダイレクト
   return (
     <div
       className={styles.container}
