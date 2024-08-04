@@ -1,43 +1,46 @@
-import useAspidaSWR from '@aspida/swr';
-import type { TaskDto } from 'common/types/task';
-import { labelValidator } from 'common/validators/task';
-import { Loading } from 'components/loading/Loading';
-import { usePickedLastMsg } from 'features/ws/AuthedWebSocket';
-import { useAlert } from 'hooks/useAlert';
+import useAspidaSWR from '@aspida/swr'; // aspidaとSWRを使用してデータフェッチを簡単にするフックをインポート
+import type { TaskDto } from 'common/types/task'; // タスクのデータ型を定義
+import { labelValidator } from 'common/validators/task'; // タスクのラベルを検証するためのバリデータをインポート
+import { Loading } from 'components/loading/Loading'; // ローディングコンポーネントをインポート
+import { usePickedLastMsg } from 'features/ws/AuthedWebSocket'; // WebSocketからの最新メッセージを取得するフックをインポート
+import { useAlert } from 'hooks/useAlert'; // アラートを表示するためのカスタムフックをインポート
 import type { FormEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { apiClient } from 'utils/apiClient';
-import { catchApiErr } from 'utils/catchApiErr';
-import styles from './taskList.module.css';
+import { apiClient } from 'utils/apiClient'; // APIクライアントをインポート
+import { catchApiErr } from 'utils/catchApiErr'; // APIエラーを処理するユーティリティをインポート
+import styles from './taskList.module.css'; // スタイルをインポート
 
+// タスクを作成する関数
 export const TaskList = () => {
-  const { setAlert } = useAlert();
-  const { data: tasks, mutate: mutateTasks } = useAspidaSWR(apiClient.private.tasks);
-  const { lastMsg } = usePickedLastMsg(['taskCreated', 'taskUpdated', 'taskDeleted']);
-  const fileRef = useRef<HTMLInputElement | null>(null);
-  const [label, setLabel] = useState('');
-  const [image, setImage] = useState<File>();
-  const previewImageUrl = useMemo(() => image && URL.createObjectURL(image), [image]);
+  const { setAlert } = useAlert(); // アラート表示を管理するためのフック
+  const { data: tasks, mutate: mutateTasks } = useAspidaSWR(apiClient.private.tasks); // タスクデータをフェッチするためのフック
+  const { lastMsg } = usePickedLastMsg(['taskCreated', 'taskUpdated', 'taskDeleted']); // 特定のタイプのWebSocketメッセージを取得するフック
+  const fileRef = useRef<HTMLInputElement | null>(null); // ファイル入力の参照を管理するためのフック
+  const [label, setLabel] = useState(''); // タスクのラベルの状態を管理
+  const [image, setImage] = useState<File>(); // タスクの画像の状態を管理
+  const previewImageUrl = useMemo(() => image && URL.createObjectURL(image), [image]); // 画像のプレビューURLを生成
 
   const createTask = async (e: FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // フォームのデフォルトの送信動作を防止
 
-    const parsedLabel = labelValidator.safeParse(label);
+    const parsedLabel = labelValidator.safeParse(label); // ラベルの検証を実行
 
     if (parsedLabel.error) {
-      await setAlert(parsedLabel.error.issues[0].message);
+      // 検証に失敗した場合
+      await setAlert(parsedLabel.error.issues[0].message); // アラートを設定
       return;
     }
-
+    // APIを使用してタスクを作成し、タスクリストを更新
     await apiClient.private.tasks
       .$post({ body: { label: parsedLabel.data, image } })
       .then((task) => mutateTasks((tasks) => [task, ...(tasks ?? [])]))
       .catch(catchApiErr);
-    setLabel('');
-    setImage(undefined);
+    setLabel(''); // ラベルの状態をリセット
+    setImage(undefined); // 画像の状態をリセット
 
-    if (fileRef.current) fileRef.current.value = '';
+    if (fileRef.current) fileRef.current.value = ''; // ファイル入力の値をリセット
   };
+  // タスクの完了状態を切り替える関数
   const toggleDone = async (task: TaskDto) => {
     await apiClient.private.tasks
       ._taskId(task.id)
@@ -45,6 +48,7 @@ export const TaskList = () => {
       .then((task) => mutateTasks((tasks) => tasks?.map((t) => (t.id === task.id ? task : t))))
       .catch(catchApiErr);
   };
+  // タスクを削除する関数
   const deleteTask = async (task: TaskDto) => {
     await apiClient.private.tasks
       ._taskId(task.id)
@@ -52,7 +56,7 @@ export const TaskList = () => {
       .then((task) => mutateTasks((tasks) => tasks?.filter((t) => t.id !== task.id)))
       .catch(catchApiErr);
   };
-
+  // WebSocketからの最新メッセージを処理
   useEffect(() => {
     if (lastMsg === undefined) return;
 
@@ -78,13 +82,13 @@ export const TaskList = () => {
         throw new Error(lastMsg satisfies never);
     }
   }, [lastMsg]);
-
+  // 画像のプレビューURLをクリーンアップ
   useEffect(() => {
     if (!previewImageUrl) return;
 
     return () => URL.revokeObjectURL(previewImageUrl);
   }, [previewImageUrl]);
-
+  // タスクがロードされていない場合、ローディングコンポーネントを表示
   if (!tasks) return <Loading visible />;
 
   return (
