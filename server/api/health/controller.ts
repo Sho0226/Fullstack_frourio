@@ -1,7 +1,7 @@
-import { CustomError } from 'service/customAssert';
-import { prismaClient } from 'service/prismaClient';
-import { s3 } from 'service/s3Client';
-import { defineController } from './$relay';
+import { CustomError } from 'service/customAssert'; //カスタムエラーハンドリングを行うためのクラス。
+import { prismaClient } from 'service/prismaClient'; //データベースとの接続を行うためのPrismaクライアント。
+import { s3 } from 'service/s3Client'; //S3（Amazon Simple Storage Service）との接続を行うためのクライアント。
+import { defineController } from './$relay'; //コントローラーを定義するための関数。
 
 const throwCustomError = (label: string) => (e: Error) => {
   /* v8 ignore next 2 */
