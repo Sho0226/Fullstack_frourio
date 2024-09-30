@@ -1,7 +1,6 @@
 import useAspidaSWR from '@aspida/swr'; // aspidaとSWRを使用してデータフェッチを簡単にするフックをインポート
 import type { TaskDto } from 'common/types/task'; // タスクのデータ型を定義
 import { labelValidator } from 'common/validators/task'; // タスクのラベルを検証するためのバリデータをインポート
-import { Loading } from 'components/loading/Loading'; // ローディングコンポーネントをインポート
 import { usePickedLastMsg } from 'features/ws/AuthedWebSocket'; // WebSocketからの最新メッセージを取得するフックをインポート
 import { useAlert } from 'hooks/useAlert'; // アラートを表示するためのカスタムフックをインポート
 import type { FormEvent } from 'react';
@@ -89,7 +88,7 @@ export const TaskList = () => {
     return () => URL.revokeObjectURL(previewImageUrl);
   }, [previewImageUrl]);
   // タスクがロードされていない場合、ローディングコンポーネントを表示
-  if (!tasks) return <Loading visible />;
+  if (!tasks) return;
 
   return (
     <div className={styles.main}>
